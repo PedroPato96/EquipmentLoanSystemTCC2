@@ -1,31 +1,30 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonCard, IonCardContent, IonIcon } from '@ionic/react';
-import { addCircleOutline, listOutline } from 'ionicons/icons';
-import './Home.css';
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonButton,
+} from "@ionic/react";
+import { useHistory } from "react-router-dom";
 
 const Home: React.FC = () => {
+  const history = useHistory();
+
+  const handleRequestLoan = () => {
+    history.push("/request-loan");
+  };
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Empréstimo de Equipamentos</IonTitle>
+          <IonTitle>Página Inicial</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonCard>
-          <IonCardContent>
-            <h2>Bem-vindo ao Sistema de Empréstimo de Equipamentos!</h2>
-            <p>Aqui você pode solicitar e gerenciar o empréstimo de equipamentos da escola.</p>
-          </IonCardContent>
-        </IonCard>
-
-        <IonButton expand="block" color="primary" routerLink="/solicitar-emprestimo">
-          <IonIcon slot="start" icon={addCircleOutline} />
+        <IonButton expand="full" onClick={handleRequestLoan}>
           Solicitar Empréstimo
-        </IonButton>
-
-        <IonButton expand="block" color="secondary" routerLink="/equipamentos">
-          <IonIcon slot="start" icon={listOutline} />
-          Ver Equipamentos Disponíveis
         </IonButton>
       </IonContent>
     </IonPage>
