@@ -13,6 +13,8 @@ import {
   IonList,
 } from '@ionic/react';
 
+import NavigationButton from '../components/NavigationButton';
+
 const RequestLoan: React.FC = () => {
   const [equipmentType, setEquipmentType] = useState('');
   const [quantity, setQuantity] = useState(0);
@@ -69,15 +71,17 @@ const RequestLoan: React.FC = () => {
               placeholder="Selecione as datas"
             />
           </IonItem>
-
         </IonList>
 
         <IonButton expand="full" onClick={handleSubmit}>
           Solicitar Empréstimo
         </IonButton>
+
+        <NavigationButton />
       </IonContent>
     </IonPage>
   );
 };
 
 export default RequestLoan;
+

@@ -1,0 +1,15 @@
+/* src/pages/AdminHome.css */
+
+.ion-padding {
+    padding: 20px;
+  }
+  
+  IonButton {
+    margin: 10px 0;
+  }
+  
+  IonToolbar {
+    background-color: #3880ff; /* Cor de fundo personalizada */
+    color: white; /* Cor do texto */
+  }
+  

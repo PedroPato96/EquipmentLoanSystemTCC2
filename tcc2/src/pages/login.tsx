@@ -1,78 +1,80 @@
+// src/pages/login.tsx
+
+import React, { useState, useEffect } from 'react';
 import {
-    IonContent,
-    IonHeader,
-    IonPage,
-    IonTitle,
-    IonToolbar,
-    IonInput,
-    IonItem,
-    IonLabel,
-    IonButton,
-    IonCard,
-    IonCardContent,
-    IonToast,  // Importando o IonToast para mostrar mensagens de erro
-  } from "@ionic/react";
-  import { useState } from "react";
-  import { useHistory } from "react-router-dom";
-  
-  const Login: React.FC = () => {
-    const [username, setUsername] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [showError, setShowError] = useState<boolean>(false);  // Estado para controlar a exibição do erro
-    const history = useHistory();
-  
-    const handleLogin = () => {
-      // Aqui você pode implementar a lógica de autenticação
-      if (username === "admin" && password === "admin") {
-        // Exemplo de credenciais válidas
-        history.push("/home");
-      } else {
-        // Se as credenciais não forem reconhecidas, mostra a mensagem de erro
-        setShowError(true);
-      }
-    };
-  
-    return (
-      <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>Login</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent className="ion-padding">
-          <IonCard>
-            <IonCardContent>
-              <IonItem>
-                <IonLabel position="floating">Nome de Usuário</IonLabel>
-                <IonInput
-                  value={username}
-                  onIonChange={(e) => setUsername(e.detail.value!)}
-                />
-              </IonItem>
-              <IonItem>
-                <IonLabel position="floating">Senha</IonLabel>
-                <IonInput
-                  type="password"
-                  value={password}
-                  onIonChange={(e) => setPassword(e.detail.value!)}
-                />
-              </IonItem>
-              <IonButton expand="full" onClick={handleLogin}>
-                Login
-              </IonButton>
-            </IonCardContent>
-          </IonCard>
-          <IonToast
-            isOpen={showError}
-            onDidDismiss={() => setShowError(false)}
-            message="Credenciais inválidas. Tente novamente."
-            duration={2000}
-            color="danger"  // A cor do toast pode ser alterada
-          />
-        </IonContent>
-      </IonPage>
-    );
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonButton,
+  IonItem,
+  IonLabel,
+  IonInput,
+} from '@ionic/react';
+import { useAuth } from '../context/AuthContext';
+import { useHistory, useLocation } from 'react-router-dom';
+
+const Login: React.FC = () => {
+  const { login, isAuthenticated, userRole } = useAuth(); // Obtenha a função de login e o estado de autenticação do contexto
+  const history = useHistory(); // Obtenha o history para redirecionar
+  const location = useLocation<{ from: { pathname: string } }>(); // Para redirecionar de volta
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleLogin = () => {
+    // Chame a função de login
+    login(username, password);
+
+    // Se o login for bem-sucedido, redirecione
+    if (isAuthenticated) {
+      // Redireciona para a página anterior ou para a página inicial apropriada
+      const redirectPath = userRole === 'admin' ? '/admin-home' : '/home';
+      history.push(redirectPath);
+    } else {
+      setError('Usuário ou senha incorretos.'); // Define uma mensagem de erro
+    }
   };
-  
-  export default Login;
-  
+
+  // Verifica a autenticação após o login
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirectPath = userRole === 'admin' ? '/admin-home' : '/home';
+      history.replace(redirectPath);
+    }
+  }, [isAuthenticated, userRole, history]);
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Login</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
+        <IonItem>
+          <IonLabel position="floating">Usuário</IonLabel>
+          <IonInput
+            value={username}
+            onIonChange={(e) => setUsername(e.detail.value!)}
+          />
+        </IonItem>
+        <IonItem>
+          <IonLabel position="floating">Senha</IonLabel>
+          <IonInput
+            type="password"
+            value={password}
+            onIonChange={(e) => setPassword(e.detail.value!)}
+          />
+        </IonItem>
+        {error && <p style={{ color: 'red' }}>{error}</p>} {/* Exibe mensagem de erro */}
+        <IonButton expand="full" onClick={handleLogin}>
+          Login
+        </IonButton>
+      </IonContent>
+    </IonPage>
+  );
+};
+
+export default Login;
