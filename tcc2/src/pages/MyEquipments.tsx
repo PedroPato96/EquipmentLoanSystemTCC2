@@ -1,51 +1,38 @@
-// src/pages/MyEquipments.tsx
-
 import {
-    IonContent,
-    IonHeader,
-    IonPage,
-    IonTitle,
-    IonToolbar,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonButton,
-  } from "@ionic/react";
-  
-  import NavigationButton from '../components/NavigationButton'; // Importar o NavigationButton
-  
-  const MyEquipments: React.FC = () => {
-    // Simulação de dados de equipamentos
-    const equipments = [
-      { id: 1, equipment: "Computador", borrowedDate: "2024-04-01" },
-      { id: 2, equipment: "Projetor", borrowedDate: "2024-04-05" },
-    ];
-  
-    return (
-      <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>Equipamentos em Meu Nome</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent className="ion-padding">
-          <IonList>
-            {equipments.map((equipment) => (
-              <IonItem key={equipment.id}>
-                <IonLabel>
-                  <h2>{equipment.equipment}</h2>
-                  <p>Data de Empréstimo: {equipment.borrowedDate}</p>
-                </IonLabel>
-              </IonItem>
-            ))}
-          </IonList>
-  
-          {/* Adicione o botão de navegação aqui */}
-          <NavigationButton />
-        </IonContent>
-      </IonPage>
-    );
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
+import EquipmentTable from '../components/EquipmentTable';
+import { useState } from "react";
+
+const MyEquipments: React.FC = () => {
+  const [equipments, setEquipments] = useState([
+    { id: 1, timestamp: new Date().toLocaleString(), employee: 'João', equipment: 'Computador', model: 'Dell', serialNumber: '12345', assetNumber: '54321', accessories: 'Mouse', returned: false, signedContract: true, observations: 'N/A' },
+    { id: 2, timestamp: new Date().toLocaleString(), employee: 'Maria', equipment: 'Projetor', model: 'BenQ', serialNumber: '67890', assetNumber: '09876', accessories: 'Cabo HDMI', returned: false, signedContract: false, observations: 'N/A' },
+  ]);
+
+  const handleDelete = (id: number) => {
+    setEquipments((prevData) => prevData.filter((item) => item.id !== id));
   };
-  
-  export default MyEquipments;
-  
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Equipamentos em Meu Nome</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
+        <EquipmentTable
+          equipmentData={equipments}
+          onDelete={handleDelete} // Passando a função onDelete
+        />
+      </IonContent>
+    </IonPage>
+  );
+};
+
+export default MyEquipments;

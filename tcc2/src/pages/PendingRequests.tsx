@@ -1,50 +1,53 @@
-// src/pages/PendingRequests.tsx
-import {
-    IonContent,
-    IonHeader,
-    IonPage,
-    IonTitle,
-    IonToolbar,
-    IonList,
-    IonItem,
-    IonLabel,
-  } from "@ionic/react";
-  
-  import NavigationButton from '../components/NavigationButton';
-  
-  const PendingRequests: React.FC = () => {
-    // Simulação de dados de solicitações pendentes
-    const pendingRequests = [
-      { id: 1, user: "João", equipment: "Computador" },
-      { id: 2, user: "Maria", equipment: "Projetor" },
-    ];
-  
-    return (
-      <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>Solicitações Pendentes</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent className="ion-padding">
-          <IonList>
-            {pendingRequests.map((request) => (
-              <IonItem key={request.id}>
-                <IonLabel>
-                  <h2>{request.equipment}</h2>
-                  <p>Solicitante: {request.user}</p>
-                </IonLabel>
-              </IonItem>
-            ))}
-          </IonList>
-  
-          {/* Coloque o NavigationButton aqui */}
-          <NavigationButton />
-        </IonContent>
-      </IonPage>
-    );
+import React, { useState } from 'react';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/react';
+import EquipmentTable from '../components/EquipmentTable';
+
+const PendingRequests: React.FC = () => {
+  const [pendingRequests, setPendingRequests] = useState([
+    {
+      id: 1,
+      timestamp: new Date().toLocaleString(),
+      employee: 'Maria',
+      equipment: 'Projetor',
+      model: 'BenQ',
+      serialNumber: '98765',
+      assetNumber: '67890',
+      accessories: 'Cabo HDMI',
+      returned: false,
+      signedContract: false,
+      observations: 'Necessário para apresentação',
+    },
+  ]);
+
+  const handleApprove = (id: number) => {
+    // Aqui você pode implementar a lógica de aprovação
+    console.log(`Pedido ${id} aprovado`);
+    // Por exemplo, você poderia adicionar o pedido aprovado a um histórico ou removê-lo da lista
+    setPendingRequests(prevData => prevData.filter(item => item.id !== id));
   };
-  
-  export default PendingRequests;
-  
-  
+
+  const handleReject = (id: number) => {
+    // Aqui você pode implementar a lógica de rejeição
+    console.log(`Pedido ${id} rejeitado`);
+    setPendingRequests(prevData => prevData.filter(item => item.id !== id));
+  };
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>Solicitações Pendentes</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="ion-padding">
+        <EquipmentTable
+          equipmentData={pendingRequests}
+          onApprove={handleApprove}
+          onReject={handleReject}
+        />
+      </IonContent>
+    </IonPage>
+  );
+};
+
+export default PendingRequests;

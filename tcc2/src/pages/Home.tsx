@@ -16,11 +16,19 @@ import {
 import { useHistory } from "react-router-dom";
 import "./Home.css";
 import NavigationButton from '../components/NavigationButton';
+
 const Home: React.FC = () => {
   const history = useHistory();
 
   const navigateTo = (path: string) => {
     history.push(path);
+  };
+
+  const handleLogoff = () => {
+    // Aqui você deve limpar o estado do usuário (se aplicável)
+    console.log('Usuário deslogado'); // Adicione a lógica para limpar o estado do usuário
+    // Redirecionar para a página de login
+    history.push('/login'); // Altere para a rota correta da sua página de login
   };
 
   return (
@@ -63,8 +71,15 @@ const Home: React.FC = () => {
               </IonButton>
             </IonCol>
           </IonRow>
+          <IonRow>
+            <IonCol size="12">
+              <IonButton expand="block" color="danger" onClick={handleLogoff}>
+                Logoff
+              </IonButton>
+            </IonCol>
+          </IonRow>
           <IonButton>
-              <NavigationButton isHome />
+            <NavigationButton isHome />
           </IonButton>
         </IonGrid>
       </IonContent>
