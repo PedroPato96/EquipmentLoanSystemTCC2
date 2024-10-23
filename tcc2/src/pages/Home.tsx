@@ -7,14 +7,12 @@ import {
   IonTitle,
   IonToolbar,
   IonButton,
-  IonCard,
-  IonCardContent,
   IonGrid,
   IonRow,
   IonCol,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
-import "./Home.css";
+import "./Home.css"; // Certifique-se de que o caminho está correto
 import NavigationButton from '../components/NavigationButton';
 
 const Home: React.FC = () => {
@@ -71,16 +69,19 @@ const Home: React.FC = () => {
               </IonButton>
             </IonCol>
           </IonRow>
+          {/* Botão Logoff abaixo de todos os outros */}
           <IonRow>
             <IonCol size="12">
-              <IonButton expand="block" color="danger" onClick={handleLogoff}>
+              <IonButton 
+                expand="block" 
+                color="danger" 
+                onClick={handleLogoff}
+                style={{ marginTop: '20px' }} // Adiciona uma margem superior
+              >
                 Logoff
               </IonButton>
             </IonCol>
           </IonRow>
-          <IonButton>
-            <NavigationButton isHome />
-          </IonButton>
         </IonGrid>
       </IonContent>
     </IonPage>

@@ -1,11 +1,16 @@
+// src/pages/PendingRequests.tsx
+
 import React, { useState } from 'react';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/react';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/react';
 import EquipmentTable from '../components/EquipmentTable';
+import { useHistory } from 'react-router-dom';
 
 const PendingRequests: React.FC = () => {
+  const history = useHistory(); // Hook para usar a navegação
+
   const [pendingRequests, setPendingRequests] = useState([
     {
-      id: 1,
+      id: 2,
       timestamp: new Date().toLocaleString(),
       employee: 'Maria',
       equipment: 'Projetor',
@@ -19,17 +24,8 @@ const PendingRequests: React.FC = () => {
     },
   ]);
 
-  const handleApprove = (id: number) => {
-    // Aqui você pode implementar a lógica de aprovação
-    console.log(`Pedido ${id} aprovado`);
-    // Por exemplo, você poderia adicionar o pedido aprovado a um histórico ou removê-lo da lista
-    setPendingRequests(prevData => prevData.filter(item => item.id !== id));
-  };
-
-  const handleReject = (id: number) => {
-    // Aqui você pode implementar a lógica de rejeição
-    console.log(`Pedido ${id} rejeitado`);
-    setPendingRequests(prevData => prevData.filter(item => item.id !== id));
+  const handleDelete = (id: number) => {
+    setPendingRequests((prevData) => prevData.filter((item) => item.id !== id));
   };
 
   return (
@@ -40,11 +36,10 @@ const PendingRequests: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <EquipmentTable
-          equipmentData={pendingRequests}
-          onApprove={handleApprove}
-          onReject={handleReject}
-        />
+        <EquipmentTable equipmentData={pendingRequests} onDelete={handleDelete} />
+        <IonButton expand="full" onClick={() => history.goBack()} color="primary" style={{ marginTop: '20px' }}>
+          Voltar
+        </IonButton>
       </IonContent>
     </IonPage>
   );
