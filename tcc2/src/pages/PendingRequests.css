@@ -1,0 +1,21 @@
+.pending-requests-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .pending-requests-table th,
+  .pending-requests-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .pending-requests-table th {
+    background-color: #f4f4f4;
+  }
+  
+  .pending-requests-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  

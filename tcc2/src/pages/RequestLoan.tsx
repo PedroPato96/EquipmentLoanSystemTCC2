@@ -66,7 +66,7 @@ const RequestLoan: React.FC = () => {
           <IonItem>
             <IonLabel>Datas de Uso</IonLabel>
             <IonDatetime
-              multiple={true}
+              multiple={false}
               onIonChange={handleDateChange}
               placeholder="Selecione as datas"
             />

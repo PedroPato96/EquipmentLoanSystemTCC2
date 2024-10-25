@@ -1,5 +1,3 @@
-// src/pages/EquipmentsList.tsx
-
 import {
   IonContent,
   IonHeader,
@@ -7,9 +5,6 @@ import {
   IonTitle,
   IonToolbar,
   IonButton,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonModal,
   IonInput,
   IonItem,
@@ -19,6 +14,8 @@ import {
 } from "@ionic/react";
 import { useState, useEffect } from "react";
 import NavigationButton from "../components/NavigationButton";
+import './EquipmentList.css';
+
 
 interface Equipment {
   timestamp: string;
@@ -111,40 +108,44 @@ const EquipmentsList: React.FC = () => {
         </IonButton>
 
         {/* Tabela de equipamentos */}
-        <IonGrid>
-          <IonRow>
-            <IonCol>Timestamp</IonCol>
-            <IonCol>Funcionário</IonCol>
-            <IonCol>Equipamento</IonCol>
-            <IonCol>Modelo</IonCol>
-            <IonCol>Número de Série</IonCol>
-            <IonCol>Número Patrimônio</IonCol>
-            <IonCol>Acessórios</IonCol>
-            <IonCol>Devolvido?</IonCol>
-            <IonCol>Contrato Assinado?</IonCol>
-            <IonCol>Observações</IonCol>
-            <IonCol>Ações</IonCol>
-          </IonRow>
-          {equipments.map((equipment, index) => (
-            <IonRow key={index}>
-              <IonCol>{equipment.timestamp}</IonCol>
-              <IonCol>{equipment.employee}</IonCol>
-              <IonCol>{equipment.equipment}</IonCol>
-              <IonCol>{equipment.model}</IonCol>
-              <IonCol>{equipment.serialNumber}</IonCol>
-              <IonCol>{equipment.assetNumber}</IonCol>
-              <IonCol>{equipment.accessories}</IonCol>
-              <IonCol>{equipment.returned ? "Sim" : "Não"}</IonCol>
-              <IonCol>{equipment.contractSigned ? "Sim" : "Não"}</IonCol>
-              <IonCol>{equipment.notes}</IonCol>
-              <IonCol>
-                <IonButton color="danger" onClick={() => removeEquipment(index)}>
-                  Remover
-                </IonButton>
-              </IonCol>
-            </IonRow>
-          ))}
-        </IonGrid>
+        <table className="equipments-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Funcionário</th>
+              <th>Equipamento</th>
+              <th>Modelo</th>
+              <th>Número de Série</th>
+              <th>Número Patrimônio</th>
+              <th>Acessórios</th>
+              <th>Devolvido?</th>
+              <th>Contrato Assinado?</th>
+              <th>Observações</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {equipments.map((equipment, index) => (
+              <tr key={index}>
+                <td>{equipment.timestamp}</td>
+                <td>{equipment.employee}</td>
+                <td>{equipment.equipment}</td>
+                <td>{equipment.model}</td>
+                <td>{equipment.serialNumber}</td>
+                <td>{equipment.assetNumber}</td>
+                <td>{equipment.accessories}</td>
+                <td>{equipment.returned ? "Sim" : "Não"}</td>
+                <td>{equipment.contractSigned ? "Sim" : "Não"}</td>
+                <td>{equipment.notes}</td>
+                <td>
+                  <IonButton color="danger" onClick={() => removeEquipment(index)}>
+                    Remover
+                  </IonButton>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
         {/* Modal para adicionar novo equipamento */}
         <IonModal isOpen={isModalOpen} onDidDismiss={() => setIsModalOpen(false)}>

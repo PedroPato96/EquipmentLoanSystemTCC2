@@ -1,13 +1,7 @@
 import React from 'react';
-import {
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonButton,
-} from '@ionic/react';
+import { IonButton } from '@ionic/react';
 
 interface Equipment {
-  id: number;
   timestamp: string;
   employee: string;
   equipment: string;
@@ -22,39 +16,52 @@ interface Equipment {
 
 interface EquipmentTableProps {
   equipmentData: Equipment[];
-  onDelete: (id: number) => void; // Adicionei a propriedade onDelete aqui
-  onApprove?: (id: number) => void; // Adicionei a propriedade onApprove opcional
-  onReject?: (id: number) => void; // Adicionei a propriedade onReject opcional
+  onDelete: (id: number) => void;
+  showDeleteButton: boolean; // Nova prop
 }
 
-const EquipmentTable: React.FC<EquipmentTableProps> = ({ equipmentData, onDelete, onApprove, onReject }) => {
+const EquipmentTable: React.FC<EquipmentTableProps> = ({ equipmentData, onDelete, showDeleteButton }) => {
   return (
-    <IonGrid>
-      <IonRow>
-        <IonCol size="1"><strong>ID</strong></IonCol>
-        <IonCol size="2"><strong>Timestamp</strong></IonCol>
-        <IonCol size="2"><strong>Funcionário</strong></IonCol>
-        <IonCol size="2"><strong>Equipamento</strong></IonCol>
-        <IonCol size="2"><strong>Modelo</strong></IonCol>
-        <IonCol size="2"><strong>Número de Série</strong></IonCol>
-        <IonCol size="1"><strong>Ações</strong></IonCol>
-      </IonRow>
-      {equipmentData.map((item) => (
-        <IonRow key={item.id}>
-          <IonCol size="1">{item.id}</IonCol>
-          <IonCol size="2">{item.timestamp}</IonCol>
-          <IonCol size="2">{item.employee}</IonCol>
-          <IonCol size="2">{item.equipment}</IonCol>
-          <IonCol size="2">{item.model}</IonCol>
-          <IonCol size="2">{item.serialNumber}</IonCol>
-          <IonCol size="1">
-            {onApprove && <IonButton onClick={() => onApprove(item.id)} color="success">Aprovar</IonButton>}
-            {onReject && <IonButton onClick={() => onReject(item.id)} color="danger">Rejeitar</IonButton>}
-            <IonButton onClick={() => onDelete(item.id)} color="medium">Remover</IonButton> {/* Botão de remover */}
-          </IonCol>
-        </IonRow>
-      ))}
-    </IonGrid>
+    <table className="equipments-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Funcionário</th>
+          <th>Equipamento</th>
+          <th>Modelo</th>
+          <th>Número de Série</th>
+          <th>Número Patrimônio</th>
+          <th>Acessórios</th>
+          <th>Devolvido?</th>
+          <th>Contrato Assinado?</th>
+          <th>Observações</th>
+          {showDeleteButton && <th>Ações</th>} {/* Condicional para o botão */}
+        </tr>
+      </thead>
+      <tbody>
+        {equipmentData.map((equipment, index) => (
+          <tr key={index}>
+            <td>{equipment.timestamp}</td>
+            <td>{equipment.employee}</td>
+            <td>{equipment.equipment}</td>
+            <td>{equipment.model}</td>
+            <td>{equipment.serialNumber}</td>
+            <td>{equipment.assetNumber}</td>
+            <td>{equipment.accessories}</td>
+            <td>{equipment.returned ? "Sim" : "Não"}</td>
+            <td>{equipment.signedContract ? "Sim" : "Não"}</td>
+            <td>{equipment.observations}</td>
+            {showDeleteButton && ( // Renderiza o botão somente se a prop for verdadeira
+              <td>
+                <IonButton color="danger" onClick={() => onDelete(equipment.id)}>
+                  Remover
+                </IonButton>
+              </td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 };
 

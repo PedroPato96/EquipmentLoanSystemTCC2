@@ -1,0 +1,26 @@
+/* src/styles.css */
+.equipments-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px; /* Espaçamento superior */
+  }
+  
+  .equipments-table th,
+  .equipments-table td {
+    border: 1px solid #ccc; /* Borda das células */
+    padding: 12px; /* Espaçamento interno das células */
+    text-align: left; /* Alinhamento do texto à esquerda */
+  }
+  
+  .equipments-table th {
+    background-color: #f4f4f4; /* Fundo do cabeçalho */
+  }
+  
+  .equipments-table tr:nth-child(even) {
+    background-color: #f9f9f9; /* Fundo alternado para linhas pares */
+  }
+  
+  .equipments-table tr:hover {
+    background-color: #eaeaea; /* Destaque ao passar o mouse sobre a linha */
+  }
+  
