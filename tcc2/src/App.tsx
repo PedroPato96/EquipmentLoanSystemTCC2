@@ -15,6 +15,7 @@ import LendToUser from './pages/LendToUser';
 import PendingRequests from './pages/PendingRequests';
 import ManageEquipment from './pages/ManageEquipment';
 import EquipmentList from './pages/EquipmentList';
+import EquipmentSummary from './pages/EquipmentSummary';  // Importando a nova página
 import PrivateRoute from './components/PrivateRoute';
 
 /* Core CSS required for Ionic components to work properly */
@@ -91,6 +92,11 @@ const App: React.FC = () => (
           {/* Admin: Lista de Equipamentos */}
           <PrivateRoute exact path="/equipment-list" requiredRole="admin">
             <EquipmentList />
+          </PrivateRoute>
+
+          {/* Admin: Resumo de Equipamentos por Tipo */}
+          <PrivateRoute exact path="/equipment-summary" requiredRole="admin">
+            <EquipmentSummary />
           </PrivateRoute>
 
           {/* Redireciona para a página de login por padrão */}

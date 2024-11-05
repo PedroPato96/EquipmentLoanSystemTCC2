@@ -57,6 +57,17 @@ const AdminHome: React.FC = () => {
             </IonCol>
           </IonRow>
           <IonRow>
+            <IonCol size="12" size-md="6">
+              <IonButton
+                expand="block"
+                color="tertiary"
+                onClick={() => navigateTo("/equipment-summary")} // Novo botão
+              >
+                Resumo de Equipamentos por Tipo
+              </IonButton>
+            </IonCol>
+          </IonRow>
+          <IonRow>
             <IonCol size="12">
               <IonButton expand="block" color="danger" onClick={handleLogoff}>
                 Logoff
