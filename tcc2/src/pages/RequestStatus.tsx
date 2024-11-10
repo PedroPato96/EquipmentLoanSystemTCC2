@@ -1,5 +1,3 @@
-// src/pages/RequestStatus.tsx
-
 import {
   IonContent,
   IonHeader,
@@ -13,6 +11,7 @@ import {
 } from "@ionic/react";
 
 import NavigationButton from '../components/NavigationButton'; // Importar o NavigationButton
+import './RequestStatus.css'; // Importar o CSS
 
 const RequestStatus: React.FC = () => {
   // Simulação de dados de solicitações
@@ -23,7 +22,7 @@ const RequestStatus: React.FC = () => {
   ];
 
   return (
-    <IonPage>
+    <IonPage className="page-request-status"> {/* Aplicando a classe CSS */}
       <IonHeader>
         <IonToolbar>
           <IonTitle>Status das Solicitações</IonTitle>
@@ -41,7 +40,7 @@ const RequestStatus: React.FC = () => {
           ))}
         </IonList>
 
-        {/* Adicione o botão de navegação aqui */}
+        {/* Botão de navegação */}
         <NavigationButton />
       </IonContent>
     </IonPage>
@@ -49,4 +48,3 @@ const RequestStatus: React.FC = () => {
 };
 
 export default RequestStatus;
-  
