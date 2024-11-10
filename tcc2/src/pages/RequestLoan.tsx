@@ -14,6 +14,7 @@ import {
 } from '@ionic/react';
 
 import NavigationButton from '../components/NavigationButton';
+import './RequestLoan.css'; // Certifique-se de que o CSS foi importado
 
 const RequestLoan: React.FC = () => {
   const [equipmentType, setEquipmentType] = useState('');
@@ -22,13 +23,12 @@ const RequestLoan: React.FC = () => {
   const [usagePeriod, setUsagePeriod] = useState('');
 
   const handleDateChange = (e: CustomEvent) => {
-    const selectedDates = e.detail.value as string; // Recebe as datas selecionadas
-    const datesArray = selectedDates.split(','); // Separa as datas em um array
-    setDates(datesArray); // Atualiza o estado com as datas selecionadas
+    const selectedDates = e.detail.value as string; 
+    const datesArray = selectedDates.split(','); 
+    setDates(datesArray); 
   };
 
   const handleSubmit = () => {
-    // Aqui você pode fazer o que for necessário com os dados, como enviar para um servidor
     console.log('Tipo de equipamento:', equipmentType);
     console.log('Quantidade:', quantity);
     console.log('Datas selecionadas:', dates);
@@ -36,7 +36,7 @@ const RequestLoan: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <IonPage className="page-request-loan"> {/* Aplica a classe CSS */}
       <IonHeader>
         <IonToolbar>
           <IonTitle>Solicitar Empréstimo</IonTitle>
@@ -84,4 +84,3 @@ const RequestLoan: React.FC = () => {
 };
 
 export default RequestLoan;
-

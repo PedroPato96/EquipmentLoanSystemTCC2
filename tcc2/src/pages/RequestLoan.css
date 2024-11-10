@@ -1,0 +1,55 @@
+/* src/pages/RequestLoan.css */
+
+.page-request-loan {
+    --ion-background-color: #f4f5f8; /* Fundo leve */
+  }
+  
+  .page-request-loan ion-toolbar {
+    --background: #3880ff; /* Cor do header */
+    color: white;
+  }
+  
+  .page-request-loan ion-title {
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .page-request-loan .ion-padding {
+    padding: 20px;
+  }
+  
+  .page-request-loan ion-item {
+    --background: white;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .page-request-loan ion-button {
+    --background: #3880ff;
+    --border-radius: 50px;
+    font-size: 18px;
+    margin-top: 20px;
+  }
+  
+  .page-request-loan ion-input,
+  .page-request-loan ion-datetime {
+    --padding-start: 15px;
+    --padding-end: 15px;
+    --border-radius: 8px;
+    background-color: #fff;
+  }
+  
+  .page-request-loan ion-button:hover {
+    --background: #3171e0;
+  }
+  
+  .page-request-loan ion-input::placeholder,
+  .page-request-loan ion-datetime::placeholder {
+    color: #999;
+  }
+  
+  .page-request-loan ion-list {
+    margin-bottom: 20px;
+  }
+  
