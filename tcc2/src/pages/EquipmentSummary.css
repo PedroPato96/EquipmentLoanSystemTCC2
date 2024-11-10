@@ -1,0 +1,61 @@
+/* Ajustes gerais para a tabela */
+.equipment-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 16px;
+  }
+  
+  /* Estilo para o cabeçalho da tabela */
+  .equipment-table thead th {
+    background-color: #f4f4f4;
+    color: #333;
+    font-weight: bold;
+    padding: 10px;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  /* Estilo para as células da tabela */
+  .equipment-table tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  /* Alternar cores nas linhas da tabela */
+  .equipment-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  /* Estilo para alinhar texto nas células */
+  .equipment-table tbody td.text-center {
+    text-align: center;
+  }
+  
+  .equipment-table tbody td.text-right {
+    text-align: right;
+  }
+  
+  /* Estilo para o título da página */
+  .page-title {
+    text-align: center;
+    font-size: 24px;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Ajuste de layout para dispositivos menores */
+  @media (max-width: 768px) {
+    .equipment-table {
+      font-size: 14px;
+    }
+  }
+
+  /* Estilo do botão de voltar */
+    .ion-button-back {
+        margin-top: 20px;
+        width: 100%;
+        color: red;
+    }
+    

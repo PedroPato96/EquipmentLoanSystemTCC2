@@ -1,0 +1,17 @@
+/* src/pages/Login.css */
+
+.ion-padding {
+  padding: 20px;
+}
+
+h1 {
+  color: #3880ff; /* Cor azul */
+}
+
+input {
+  margin: 10px 0; /* Margem para os campos de entrada */
+}
+
+.ion-button {
+  margin-top: 10px; /* Margem superior para o botão */
+}
