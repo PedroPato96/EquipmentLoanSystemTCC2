@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonSpinner } from '@ionic/react';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonSpinner, IonToast } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import './PendingRequests.css';
 
@@ -8,6 +8,7 @@ const PendingRequests: React.FC = () => {
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // Estado para mostrar carregamento
   const [error, setError] = useState<string | null>(null); // Estado para erros
+  const [toastMessage, setToastMessage] = useState<string | null>(null); // Mensagens de feedback
 
   // Buscar dados da API
   useEffect(() => {
@@ -30,19 +31,65 @@ const PendingRequests: React.FC = () => {
     fetchRequests();
   }, []);
 
-  const handleDelete = (id: number) => {
-    setPendingRequests((prevData) => prevData.filter((item) => item.id !== id));
-    // Lógica adicional para deletar do backend pode ser implementada aqui
+  // Ações de aprovação, rejeição e cancelamento
+  const handleApprove = async (id: number) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/emprestimos/${id}/aprovar`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao aprovar a solicitação.');
+      }
+
+      // Atualiza o estado removendo o item aprovado
+      setPendingRequests((prevData) => prevData.filter((item) => item.id !== id));
+
+      // Exibe mensagem de sucesso
+      setToastMessage('Solicitação aprovada com sucesso!');
+    } catch (err: any) {
+      setToastMessage(`Erro: ${err.message}`);
+    }
   };
 
-  const handleApprove = (id: number) => {
-    console.log(`Solicitação ${id} aprovada.`);
-    // Lógica para enviar aprovação ao backend pode ser implementada aqui
+  const handleReject = async (id: number) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/emprestimos/${id}/rejeitar`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao rejeitar a solicitação.');
+      }
+
+      // Atualiza o estado removendo o item rejeitado
+      setPendingRequests((prevData) => prevData.filter((item) => item.id !== id));
+
+      // Exibe mensagem de sucesso
+      setToastMessage('Solicitação rejeitada com sucesso!');
+    } catch (err: any) {
+      setToastMessage(`Erro: ${err.message}`);
+    }
   };
 
-  const handleReject = (id: number) => {
-    console.log(`Solicitação ${id} rejeitada.`);
-    // Lógica para enviar rejeição ao backend pode ser implementada aqui
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/api/emprestimos/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao cancelar a solicitação.');
+      }
+
+      // Atualiza o estado removendo o item cancelado
+      setPendingRequests((prevData) => prevData.filter((item) => item.id !== id));
+
+      // Exibe mensagem de sucesso
+      setToastMessage('Solicitação cancelada com sucesso!');
+    } catch (err: any) {
+      setToastMessage(`Erro: ${err.message}`);
+    }
   };
 
   if (loading) {
@@ -127,6 +174,15 @@ const PendingRequests: React.FC = () => {
         <IonButton expand="full" onClick={() => history.goBack()} color="primary" style={{ marginTop: '20px' }}>
           Voltar
         </IonButton>
+
+        {toastMessage && (
+          <IonToast
+            isOpen={!!toastMessage}
+            message={toastMessage}
+            duration={3000}
+            onDidDismiss={() => setToastMessage(null)}
+          />
+        )}
       </IonContent>
     </IonPage>
   );
