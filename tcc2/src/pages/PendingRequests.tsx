@@ -1,53 +1,82 @@
-import React, { useState } from 'react';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/react';
+import React, { useState, useEffect } from 'react';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonSpinner } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import './PendingRequests.css'; // Importar arquivo CSS para estilização
+import './PendingRequests.css';
 
 const PendingRequests: React.FC = () => {
   const history = useHistory(); // Hook para usar a navegação
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true); // Estado para mostrar carregamento
+  const [error, setError] = useState<string | null>(null); // Estado para erros
 
-  const [pendingRequests, setPendingRequests] = useState([
-    {
-      id: 1,
-      timestamp: new Date().toLocaleString(),
-      employee: 'João',
-      equipment: 'Computador',
-      model: 'Dell',
-      serialNumber: '12345',
-      assetNumber: '54321',
-      accessories: 'Mouse',
-      returned: false,
-      signedContract: true,
-      observations: 'N/A',
-    },
-    {
-      id: 2,
-      timestamp: new Date().toLocaleString(),
-      employee: 'Maria',
-      equipment: 'Projetor',
-      model: 'BenQ',
-      serialNumber: '98765',
-      assetNumber: '67890',
-      accessories: 'Cabo HDMI',
-      returned: false,
-      signedContract: false,
-      observations: 'Necessário para apresentação',
-    },
-  ]);
+  // Buscar dados da API
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/api/emprestimos');
+        if (!response.ok) {
+          throw new Error(`Erro ao buscar dados: ${response.statusText}`);
+        }
+        const data = await response.json();
+        setPendingRequests(data);
+        setError(null);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequests();
+  }, []);
 
   const handleDelete = (id: number) => {
     setPendingRequests((prevData) => prevData.filter((item) => item.id !== id));
+    // Lógica adicional para deletar do backend pode ser implementada aqui
   };
 
   const handleApprove = (id: number) => {
     console.log(`Solicitação ${id} aprovada.`);
-    // Lógica para aprovar a solicitação pode ser adicionada aqui
+    // Lógica para enviar aprovação ao backend pode ser implementada aqui
   };
 
   const handleReject = (id: number) => {
     console.log(`Solicitação ${id} rejeitada.`);
-    // Lógica para rejeitar a solicitação pode ser adicionada aqui
+    // Lógica para enviar rejeição ao backend pode ser implementada aqui
   };
+
+  if (loading) {
+    return (
+      <IonPage>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>Carregando...</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+          <IonSpinner name="crescent" />
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  if (error) {
+    return (
+      <IonPage>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>Erro</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+          <p>{error}</p>
+          <IonButton onClick={() => history.goBack()} color="primary">
+            Voltar
+          </IonButton>
+        </IonContent>
+      </IonPage>
+    );
+  }
 
   return (
     <IonPage>
@@ -77,15 +106,15 @@ const PendingRequests: React.FC = () => {
             {pendingRequests.map((request) => (
               <tr key={request.id}>
                 <td>{request.id}</td>
-                <td>{request.employee}</td>
-                <td>{request.equipment}</td>
-                <td>{request.model}</td>
-                <td>{request.serialNumber}</td>
-                <td>{request.assetNumber}</td>
-                <td>{request.accessories}</td>
-                <td>{request.returned ? 'Sim' : 'Não'}</td>
-                <td>{request.signedContract ? 'Sim' : 'Não'}</td>
-                <td>{request.observations}</td>
+                <td>{request.funcionario}</td>
+                <td>{request.equipamento}</td>
+                <td>{request.modelo_equipamento || 'N/A'}</td>
+                <td>{request.numero_serie}</td>
+                <td>{request.numero_patrimonio}</td>
+                <td>{request.acessorios || 'N/A'}</td>
+                <td>{request.devolvido ? 'Sim' : 'Não'}</td>
+                <td>{request.contrato_assinado ? 'Sim' : 'Não'}</td>
+                <td>{request.observacoes || 'N/A'}</td>
                 <td>
                   <IonButton onClick={() => handleApprove(request.id)} color="success">Aprovar</IonButton>
                   <IonButton onClick={() => handleReject(request.id)} color="danger">Rejeitar</IonButton>

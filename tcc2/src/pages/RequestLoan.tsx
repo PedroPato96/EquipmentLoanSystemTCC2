@@ -11,6 +11,7 @@ import {
   IonDatetime,
   IonInput,
   IonList,
+  IonTextarea,
   IonToast,
 } from '@ionic/react';
 
@@ -19,9 +20,13 @@ import './RequestLoan.css'; // Certifique-se de que o CSS foi importado
 
 const RequestLoan: React.FC = () => {
   const [equipmentType, setEquipmentType] = useState('');
+  const [model, setModel] = useState('');
+  const [serialNumber, setSerialNumber] = useState('');
+  const [assetNumber, setAssetNumber] = useState('');
+  const [accessories, setAccessories] = useState('');
   const [quantity, setQuantity] = useState(0);
   const [dates, setDates] = useState<string[]>([]);
-  const [usagePeriod, setUsagePeriod] = useState('');
+  const [observations, setObservations] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const handleDateChange = (e: CustomEvent) => {
@@ -33,15 +38,17 @@ const RequestLoan: React.FC = () => {
   const handleSubmit = async () => {
     const requestData = {
       equipamento: equipmentType,
-      data_in: dates[0], // Considerando a primeira data como data de início
+      modelo_equipamento: model,
+      numero_serie: serialNumber,
+      numero_patrimonio: assetNumber,
+      acessorios: accessories,
+      quantidade: quantity,
+      data_in: dates[0], // Data de início do uso
+      data_out: dates[1] || '', // Data de término do uso (se aplicável)
       funcionario: "Nome do Funcionário", // Substituir por dados reais
-      modelo_equipamento: "Modelo Exemplo", // Adapte conforme necessário
-      numero_serie: "12345", // Adapte conforme necessário
-      numero_patrimonio: "67890", // Adapte conforme necessário
-      acessorios: "Acessórios Exemplares", // Adapte conforme necessário
       devolvido: false,
       contrato_assinado: false,
-      observacoes: "Sem observações",
+      observacoes: observations || 'Sem observações',
     };
 
     try {
@@ -83,6 +90,42 @@ const RequestLoan: React.FC = () => {
           </IonItem>
 
           <IonItem>
+            <IonLabel>Modelo</IonLabel>
+            <IonInput
+              value={model}
+              onIonChange={(e) => setModel(e.detail.value!)}
+              placeholder="Digite o modelo do equipamento"
+            />
+          </IonItem>
+
+          <IonItem>
+            <IonLabel>Número de Série</IonLabel>
+            <IonInput
+              value={serialNumber}
+              onIonChange={(e) => setSerialNumber(e.detail.value!)}
+              placeholder="Digite o número de série"
+            />
+          </IonItem>
+
+          <IonItem>
+            <IonLabel>Número do Patrimônio</IonLabel>
+            <IonInput
+              value={assetNumber}
+              onIonChange={(e) => setAssetNumber(e.detail.value!)}
+              placeholder="Digite o número do patrimônio"
+            />
+          </IonItem>
+
+          <IonItem>
+            <IonLabel>Acessórios</IonLabel>
+            <IonInput
+              value={accessories}
+              onIonChange={(e) => setAccessories(e.detail.value!)}
+              placeholder="Digite os acessórios incluídos"
+            />
+          </IonItem>
+
+          <IonItem>
             <IonLabel>Quantidade</IonLabel>
             <IonInput
               type="number"
@@ -98,6 +141,15 @@ const RequestLoan: React.FC = () => {
               multiple={false}
               onIonChange={handleDateChange}
               placeholder="Selecione as datas"
+            />
+          </IonItem>
+
+          <IonItem>
+            <IonLabel>Observações</IonLabel>
+            <IonTextarea
+              value={observations}
+              onIonChange={(e) => setObservations(e.detail.value!)}
+              placeholder="Digite observações adicionais"
             />
           </IonItem>
         </IonList>
@@ -122,3 +174,4 @@ const RequestLoan: React.FC = () => {
 };
 
 export default RequestLoan;
+
