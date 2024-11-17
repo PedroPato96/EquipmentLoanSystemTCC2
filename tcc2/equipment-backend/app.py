@@ -81,5 +81,68 @@ def create_emprestimo():
         "observacoes": novo_emprestimo[10],
     })
 
+# Endpoint para aprovar um empréstimo
+@app.route('/api/emprestimos/<int:id>/aprovar', methods=['POST'])
+def aprovar_emprestimo(id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Atualiza o status do empréstimo para aprovado (devolvido = TRUE)
+        cursor.execute(
+            '''
+            UPDATE emprestimos
+            SET devolvido = TRUE
+            WHERE id = %s
+            RETURNING *;
+            ''',
+            (id,)
+        )
+        emprestimo_aprovado = cursor.fetchone()
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        if emprestimo_aprovado:
+            return jsonify({
+                "id": emprestimo_aprovado[0],
+                "message": "Empréstimo aprovado com sucesso."
+            }), 200
+        else:
+            return jsonify({"error": "Empréstimo não encontrado."}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Endpoint para rejeitar um empréstimo
+@app.route('/api/emprestimos/<int:id>/rejeitar', methods=['POST'])
+def rejeitar_emprestimo(id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Remove o empréstimo da base de dados
+        cursor.execute(
+            '''
+            DELETE FROM emprestimos
+            WHERE id = %s
+            RETURNING id;
+            ''',
+            (id,)
+        )
+        emprestimo_rejeitado = cursor.fetchone()
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        if emprestimo_rejeitado:
+            return jsonify({
+                "id": emprestimo_rejeitado[0],
+                "message": "Empréstimo rejeitado com sucesso."
+            }), 200
+        else:
+            return jsonify({"error": "Empréstimo não encontrado."}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     app.run(port=5000)

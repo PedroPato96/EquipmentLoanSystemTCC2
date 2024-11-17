@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonSpinner, IonToast } from '@ionic/react';
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButton,
+  IonSpinner,
+  IonToast,
+} from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import './PendingRequests.css';
 
 const PendingRequests: React.FC = () => {
-  const history = useHistory(); // Hook para usar a navegação
+  const history = useHistory();
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // Estado para mostrar carregamento
-  const [error, setError] = useState<string | null>(null); // Estado para erros
-  const [toastMessage, setToastMessage] = useState<string | null>(null); // Mensagens de feedback
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Buscar dados da API
+  // Fetch requests from API
   useEffect(() => {
     const fetchRequests = async () => {
       try {
@@ -20,9 +29,8 @@ const PendingRequests: React.FC = () => {
         }
         const data = await response.json();
         setPendingRequests(data);
-        setError(null);
       } catch (err: any) {
-        setError(err.message);
+        setError(err.message || 'Erro inesperado ao buscar dados.');
       } finally {
         setLoading(false);
       }
@@ -31,64 +39,33 @@ const PendingRequests: React.FC = () => {
     fetchRequests();
   }, []);
 
-  // Ações de aprovação, rejeição e cancelamento
-  const handleApprove = async (id: number) => {
+  // Handle API actions
+  const handleAction = async (id: number, action: 'aprovar' | 'rejeitar') => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/emprestimos/${id}/aprovar`, {
-        method: 'POST',
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao aprovar a solicitação.');
+      if (!['aprovar', 'rejeitar'].includes(action)) {
+        throw new Error('Ação inválida.');
       }
 
-      // Atualiza o estado removendo o item aprovado
-      setPendingRequests((prevData) => prevData.filter((item) => item.id !== id));
+      const endpoint = `http://127.0.0.1:5000/api/emprestimos/${id}/${action}`;
+      const response = await fetch(endpoint, { method: 'POST' });
 
-      // Exibe mensagem de sucesso
-      setToastMessage('Solicitação aprovada com sucesso!');
-    } catch (err: any) {
-      setToastMessage(`Erro: ${err.message}`);
-    }
-  };
+      if (response.ok) {
+        // Atualiza o estado removendo o item processado
+        setPendingRequests((prevRequests) =>
+          prevRequests.filter((request) => request.id !== id)
+        );
 
-  const handleReject = async (id: number) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:5000/api/emprestimos/${id}/rejeitar`, {
-        method: 'POST',
-      });
+        const actionMessage = {
+          aprovar: 'aprovada',
+          rejeitar: 'rejeitada',
+        };
 
-      if (!response.ok) {
-        throw new Error('Erro ao rejeitar a solicitação.');
+        setToastMessage(`Solicitação ${actionMessage[action]} com sucesso!`);
+      } else {
+        throw new Error(`Erro ao ${action} a solicitação.`);
       }
-
-      // Atualiza o estado removendo o item rejeitado
-      setPendingRequests((prevData) => prevData.filter((item) => item.id !== id));
-
-      // Exibe mensagem de sucesso
-      setToastMessage('Solicitação rejeitada com sucesso!');
     } catch (err: any) {
-      setToastMessage(`Erro: ${err.message}`);
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:5000/api/emprestimos/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao cancelar a solicitação.');
-      }
-
-      // Atualiza o estado removendo o item cancelado
-      setPendingRequests((prevData) => prevData.filter((item) => item.id !== id));
-
-      // Exibe mensagem de sucesso
-      setToastMessage('Solicitação cancelada com sucesso!');
-    } catch (err: any) {
-      setToastMessage(`Erro: ${err.message}`);
+      setToastMessage(err.message || 'Erro ao realizar a ação.');
     }
   };
 
@@ -163,15 +140,29 @@ const PendingRequests: React.FC = () => {
                 <td>{request.contrato_assinado ? 'Sim' : 'Não'}</td>
                 <td>{request.observacoes || 'N/A'}</td>
                 <td>
-                  <IonButton onClick={() => handleApprove(request.id)} color="success">Aprovar</IonButton>
-                  <IonButton onClick={() => handleReject(request.id)} color="danger">Rejeitar</IonButton>
-                  <IonButton onClick={() => handleDelete(request.id)} color="dark">Cancelar</IonButton>
+                  <IonButton
+                    onClick={() => handleAction(request.id, 'aprovar')}
+                    color="success"
+                  >
+                    Aprovar
+                  </IonButton>
+                  <IonButton
+                    onClick={() => handleAction(request.id, 'rejeitar')}
+                    color="danger"
+                  >
+                    Rejeitar
+                  </IonButton>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <IonButton expand="full" onClick={() => history.goBack()} color="primary" style={{ marginTop: '20px' }}>
+        <IonButton
+          expand="full"
+          onClick={() => history.goBack()}
+          color="primary"
+          style={{ marginTop: '20px' }}
+        >
           Voltar
         </IonButton>
 
