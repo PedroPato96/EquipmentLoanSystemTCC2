@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   IonContent,
   IonHeader,
@@ -9,48 +10,47 @@ import {
   IonInput,
   IonItem,
   IonLabel,
-  IonTextarea,
-  IonCheckbox,
+  IonToast,
 } from "@ionic/react";
-import { useState, useEffect } from "react";
-import NavigationButton from "../components/NavigationButton";
-import "./EquipmentList.css";
+import { useHistory } from "react-router-dom";
+import "./EquipmentList.css" ;
 
 interface Equipment {
-  id: number; // ID único de cada equipamento
-  timestamp: string; // Data de criação/atualização
-  employee: string;
-  equipment: string;
-  model: string;
-  serialNumber: string;
-  assetNumber: string;
-  accessories: string;
-  returned: boolean;
-  contractSigned: boolean;
-  notes: string;
+  id: number;
+  data_in: string;
+  funcionario: string;
+  equipamento: string;
+  modelo_equipamento?: string;
+  numero_serie: string;
+  numero_patrimonio: string;
+  acessorios?: string;
+  devolvido: boolean;
+  contrato_assinado: boolean;
+  observacoes?: string;
 }
 
-const EquipmentsList: React.FC = () => {
+const EquipmentList: React.FC = () => {
+  const history = useHistory();
   const [equipments, setEquipments] = useState<Equipment[]>([]);
-  const [newEquipment, setNewEquipment] = useState<Omit<Equipment, "id" | "timestamp">>({
-    employee: "",
-    equipment: "",
-    model: "",
-    serialNumber: "",
-    assetNumber: "",
-    accessories: "",
-    returned: false,
-    contractSigned: false,
-    notes: "",
+  const [newEquipment, setNewEquipment] = useState<Omit<Equipment, "id" | "devolvido" | "contrato_assinado">>({
+    data_in: "",
+    funcionario: "",
+    equipamento: "",
+    modelo_equipamento: "",
+    numero_serie: "",
+    numero_patrimonio: "",
+    acessorios: "",
+    observacoes: "",
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Carregar equipamentos da API ao montar o componente
+  // Carregar equipamentos do backend
   useEffect(() => {
     const fetchEquipments = async () => {
       try {
         const response = await fetch("http://127.0.0.1:5000/api/emprestimos");
-        if (!response.ok) throw new Error("Erro ao carregar os equipamentos");
+        if (!response.ok) throw new Error("Erro ao carregar equipamentos");
         const data = await response.json();
         setEquipments(data);
       } catch (error) {
@@ -61,16 +61,10 @@ const EquipmentsList: React.FC = () => {
     fetchEquipments();
   }, []);
 
-  // Adicionar novo equipamento
+  // Adicionar equipamento
   const addEquipment = async () => {
-    if (
-      !newEquipment.employee ||
-      !newEquipment.equipment ||
-      !newEquipment.model ||
-      !newEquipment.serialNumber ||
-      !newEquipment.assetNumber
-    ) {
-      alert("Por favor, preencha todos os campos obrigatórios.");
+    if (!newEquipment.data_in || !newEquipment.funcionario || !newEquipment.equipamento || !newEquipment.numero_serie || !newEquipment.numero_patrimonio) {
+      setToastMessage("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
 
@@ -80,31 +74,36 @@ const EquipmentsList: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newEquipment),
+        body: JSON.stringify({
+          ...newEquipment,
+          devolvido: false,
+          contrato_assinado: false,
+        }),
       });
 
-      if (!response.ok) throw new Error("Erro ao adicionar equipamento");
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Erro ao adicionar equipamento");
+      }
 
       const addedEquipment = await response.json();
       setEquipments((prevEquipments) => [...prevEquipments, addedEquipment]);
 
-      // Resetar o formulário
       setNewEquipment({
-        employee: "",
-        equipment: "",
-        model: "",
-        serialNumber: "",
-        assetNumber: "",
-        accessories: "",
-        returned: false,
-        contractSigned: false,
-        notes: "",
+        data_in: "",
+        funcionario: "",
+        equipamento: "",
+        modelo_equipamento: "",
+        numero_serie: "",
+        numero_patrimonio: "",
+        acessorios: "",
+        observacoes: "",
       });
-
       setIsModalOpen(false);
+      setToastMessage("Equipamento adicionado com sucesso!");
     } catch (error) {
       console.error("Erro ao adicionar equipamento:", error);
-      alert("Erro ao adicionar equipamento. Tente novamente.");
+      setToastMessage("Erro ao adicionar equipamento. Tente novamente.");
     }
   };
 
@@ -115,12 +114,16 @@ const EquipmentsList: React.FC = () => {
         method: "DELETE",
       });
 
-      if (!response.ok) throw new Error("Erro ao remover equipamento");
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Erro ao remover equipamento");
+      }
 
       setEquipments((prevEquipments) => prevEquipments.filter((item) => item.id !== id));
+      setToastMessage("Equipamento removido com sucesso!");
     } catch (error) {
       console.error("Erro ao remover equipamento:", error);
-      alert("Erro ao remover equipamento. Tente novamente.");
+      setToastMessage("Erro ao remover equipamento. Tente novamente.");
     }
   };
 
@@ -135,20 +138,20 @@ const EquipmentsList: React.FC = () => {
         <IonButton expand="block" onClick={() => setIsModalOpen(true)}>
           Adicionar Novo Equipamento
         </IonButton>
+        <IonButton expand="block" color="light" onClick={() => history.goBack()}>
+          Voltar
+        </IonButton>
 
-        {/* Tabela de equipamentos */}
         <table className="equipments-table">
           <thead>
             <tr>
-              <th>Timestamp</th>
+              <th>Data</th>
               <th>Funcionário</th>
               <th>Equipamento</th>
               <th>Modelo</th>
               <th>Número de Série</th>
               <th>Número Patrimônio</th>
               <th>Acessórios</th>
-              <th>Devolvido?</th>
-              <th>Contrato Assinado?</th>
               <th>Observações</th>
               <th>Ações</th>
             </tr>
@@ -156,16 +159,14 @@ const EquipmentsList: React.FC = () => {
           <tbody>
             {equipments.map((equipment) => (
               <tr key={equipment.id}>
-                <td>{equipment.timestamp}</td>
-                <td>{equipment.employee}</td>
-                <td>{equipment.equipment}</td>
-                <td>{equipment.model}</td>
-                <td>{equipment.serialNumber}</td>
-                <td>{equipment.assetNumber}</td>
-                <td>{equipment.accessories}</td>
-                <td>{equipment.returned ? "Sim" : "Não"}</td>
-                <td>{equipment.contractSigned ? "Sim" : "Não"}</td>
-                <td>{equipment.notes}</td>
+                <td>{equipment.data_in}</td>
+                <td>{equipment.funcionario}</td>
+                <td>{equipment.equipamento}</td>
+                <td>{equipment.modelo_equipamento || "N/A"}</td>
+                <td>{equipment.numero_serie}</td>
+                <td>{equipment.numero_patrimonio}</td>
+                <td>{equipment.acessorios || "N/A"}</td>
+                <td>{equipment.observacoes || "N/A"}</td>
                 <td>
                   <IonButton color="danger" onClick={() => removeEquipment(equipment.id)}>
                     Remover
@@ -176,7 +177,6 @@ const EquipmentsList: React.FC = () => {
           </tbody>
         </table>
 
-        {/* Modal para adicionar novo equipamento */}
         <IonModal isOpen={isModalOpen} onDidDismiss={() => setIsModalOpen(false)}>
           <IonHeader>
             <IonToolbar>
@@ -184,49 +184,76 @@ const EquipmentsList: React.FC = () => {
             </IonToolbar>
           </IonHeader>
           <IonContent className="ion-padding">
-            {/* Formulário do modal */}
+            <IonItem>
+              <IonLabel position="floating">Data *</IonLabel>
+              <IonInput
+                type="date"
+                value={newEquipment.data_in}
+                onIonChange={(e) =>
+                  setNewEquipment({ ...newEquipment, data_in: e.detail.value! })
+                }
+              />
+            </IonItem>
             <IonItem>
               <IonLabel position="floating">Funcionário *</IonLabel>
               <IonInput
-                value={newEquipment.employee}
+                value={newEquipment.funcionario}
                 onIonChange={(e) =>
-                  setNewEquipment({ ...newEquipment, employee: e.detail.value! })
+                  setNewEquipment({ ...newEquipment, funcionario: e.detail.value! })
                 }
               />
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Equipamento *</IonLabel>
               <IonInput
-                value={newEquipment.equipment}
+                value={newEquipment.equipamento}
                 onIonChange={(e) =>
-                  setNewEquipment({ ...newEquipment, equipment: e.detail.value! })
+                  setNewEquipment({ ...newEquipment, equipamento: e.detail.value! })
                 }
               />
             </IonItem>
             <IonItem>
-              <IonLabel position="floating">Modelo *</IonLabel>
+              <IonLabel position="floating">Modelo</IonLabel>
               <IonInput
-                value={newEquipment.model}
+                value={newEquipment.modelo_equipamento}
                 onIonChange={(e) =>
-                  setNewEquipment({ ...newEquipment, model: e.detail.value! })
+                  setNewEquipment({ ...newEquipment, modelo_equipamento: e.detail.value! })
                 }
               />
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Número de Série *</IonLabel>
               <IonInput
-                value={newEquipment.serialNumber}
+                value={newEquipment.numero_serie}
                 onIonChange={(e) =>
-                  setNewEquipment({ ...newEquipment, serialNumber: e.detail.value! })
+                  setNewEquipment({ ...newEquipment, numero_serie: e.detail.value! })
                 }
               />
             </IonItem>
             <IonItem>
               <IonLabel position="floating">Número Patrimônio *</IonLabel>
               <IonInput
-                value={newEquipment.assetNumber}
+                value={newEquipment.numero_patrimonio}
                 onIonChange={(e) =>
-                  setNewEquipment({ ...newEquipment, assetNumber: e.detail.value! })
+                  setNewEquipment({ ...newEquipment, numero_patrimonio: e.detail.value! })
+                }
+              />
+            </IonItem>
+            <IonItem>
+              <IonLabel position="floating">Acessórios</IonLabel>
+              <IonInput
+                value={newEquipment.acessorios}
+                onIonChange={(e) =>
+                  setNewEquipment({ ...newEquipment, acessorios: e.detail.value! })
+                }
+              />
+            </IonItem>
+            <IonItem>
+              <IonLabel position="floating">Observações</IonLabel>
+              <IonInput
+                value={newEquipment.observacoes}
+                onIonChange={(e) =>
+                  setNewEquipment({ ...newEquipment, observacoes: e.detail.value! })
                 }
               />
             </IonItem>
@@ -239,10 +266,17 @@ const EquipmentsList: React.FC = () => {
           </IonContent>
         </IonModal>
 
-        <NavigationButton />
+        {toastMessage && (
+          <IonToast
+            isOpen={!!toastMessage}
+            message={toastMessage}
+            duration={3000}
+            onDidDismiss={() => setToastMessage(null)}
+          />
+        )}
       </IonContent>
     </IonPage>
   );
 };
 
-export default EquipmentsList;
+export default EquipmentList;
