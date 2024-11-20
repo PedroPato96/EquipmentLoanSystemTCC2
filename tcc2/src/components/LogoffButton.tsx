@@ -2,16 +2,29 @@
 
 import React from 'react';
 import { IonButton } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
 
 const LogoffButton: React.FC<{ onLogoff: () => void }> = ({ onLogoff }) => {
-  const history = useHistory();
 
   const handleLogoff = () => {
+    // Limpar dados persistentes do navegador
+    localStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_token');
+
     // Chame a função que limpa o estado do usuário
     onLogoff();
-    // Redirecione para a página de login
-    history.push('/login'); // Mude o caminho de acordo com sua rota de login
+
+    // Simular pressionamento da tecla F5
+    const event = new KeyboardEvent('keydown', {
+      key: 'F5',
+      keyCode: 116,
+      code: 'F5',
+      which: 116,
+      bubbles: true,
+      cancelable: true,
+    });
+
+    // Disparar o evento de teclado
+    window.dispatchEvent(event);
   };
 
   return (

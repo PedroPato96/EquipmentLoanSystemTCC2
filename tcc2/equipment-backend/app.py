@@ -20,12 +20,12 @@ def get_db_connection():
     )
     return conn
 
-# Endpoint para listar todos os empréstimos
+# Endpoint para listar todos os empréstimos pendentes
 @app.route('/api/emprestimos', methods=['GET'])
 def get_emprestimos():
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM emprestimos;')
+    cursor.execute('SELECT * FROM emprestimos WHERE aprovado = FALSE AND rejeitado = FALSE;')
     emprestimos = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -42,8 +42,9 @@ def get_emprestimos():
             "numero_patrimonio": e[6],
             "acessorios": e[7],
             "devolvido": e[8],
-            "contrato_assinado": e[9],
-            "observacoes": e[10],
+            "aprovado": e[9],
+            "rejeitado": e[10],
+            "observacoes": e[11],
         }
         for e in emprestimos
     ]
@@ -53,33 +54,51 @@ def get_emprestimos():
 @app.route('/api/emprestimos', methods=['POST'])
 def create_emprestimo():
     data = request.json
+    print("Dados recebidos:", data)  # Log para depuração
+
+    # Verificar se 'data_in' existe
+    if 'data_in' not in data:
+        return jsonify({"error": "'data_in' é obrigatório."}), 400
+    if 'observacoes' not in data:
+        data['observacoes'] = 'Sem observações'  # Definir valor padrão se não houver observações
+
+    # Definir valores para os campos opcionais (sem que o usuário precise preenchê-los)
+    numero_serie = data.get('numero_serie', 'Não informado')  # Valor default
+    numero_patrimonio = data.get('numero_patrimonio', 'Não informado')  # Valor default
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        '''
-        INSERT INTO emprestimos (data_in, funcionario, equipamento, modelo_equipamento, numero_serie, numero_patrimonio, acessorios, devolvido, contrato_assinado, observacoes)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *;
-        ''',
-        (data['data_in'], data['funcionario'], data['equipamento'], data['modelo_equipamento'], data['numero_serie'], data['numero_patrimonio'], data['acessorios'], data['devolvido'], data['contrato_assinado'], data['observacoes'])
-    )
-    novo_emprestimo = cursor.fetchone()
-    conn.commit()
-    cursor.close()
-    conn.close()
 
-    return jsonify({
-        "id": novo_emprestimo[0],
-        "data_in": novo_emprestimo[1],
-        "funcionario": novo_emprestimo[2],
-        "equipamento": novo_emprestimo[3],
-        "modelo_equipamento": novo_emprestimo[4],
-        "numero_serie": novo_emprestimo[5],
-        "numero_patrimonio": novo_emprestimo[6],
-        "acessorios": novo_emprestimo[7],
-        "devolvido": novo_emprestimo[8],
-        "contrato_assinado": novo_emprestimo[9],
-        "observacoes": novo_emprestimo[10],
-    })
+    try:
+        cursor.execute(
+            '''
+            INSERT INTO emprestimos (data_in, funcionario, equipamento, modelo_equipamento, numero_serie, numero_patrimonio, acessorios, devolvido, aprovado, rejeitado, observacoes)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING *;
+            ''',
+            (data['data_in'], data['funcionario'], data['equipamento'], data['modelo_equipamento'], numero_serie, numero_patrimonio, data['acessorios'], False, False, data['observacoes'])
+        )
+        novo_emprestimo = cursor.fetchone()
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "id": novo_emprestimo[0],
+            "data_in": novo_emprestimo[1],
+            "funcionario": novo_emprestimo[2],
+            "equipamento": novo_emprestimo[3],
+            "modelo_equipamento": novo_emprestimo[4],
+            "numero_serie": novo_emprestimo[5],  # Exibe o valor inserido, que pode ser 'Não informado'
+            "numero_patrimonio": novo_emprestimo[6],  # Exibe o valor inserido, que pode ser 'Não informado'
+            "acessorios": novo_emprestimo[7],
+            "devolvido": novo_emprestimo[8],
+            "aprovado": novo_emprestimo[9],
+            "rejeitado": novo_emprestimo[10],
+            "observacoes": novo_emprestimo[11],
+        })
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Endpoint para aprovar um empréstimo
 @app.route('/api/emprestimos/<int:id>/aprovar', methods=['POST'])
@@ -88,11 +107,11 @@ def aprovar_emprestimo(id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Atualiza o status do empréstimo para aprovado (devolvido = TRUE)
+        # Atualiza o status do empréstimo para aprovado
         cursor.execute(
             '''
             UPDATE emprestimos
-            SET devolvido = TRUE
+            SET aprovado = TRUE
             WHERE id = %s
             RETURNING *;
             ''',
@@ -120,12 +139,13 @@ def rejeitar_emprestimo(id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Remove o empréstimo da base de dados
+        # Atualiza o status do empréstimo para rejeitado
         cursor.execute(
             '''
-            DELETE FROM emprestimos
+            UPDATE emprestimos
+            SET rejeitado = TRUE
             WHERE id = %s
-            RETURNING id;
+            RETURNING *;
             ''',
             (id,)
         )

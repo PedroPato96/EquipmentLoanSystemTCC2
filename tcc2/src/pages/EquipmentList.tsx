@@ -13,7 +13,7 @@ import {
   IonToast,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
-import "./EquipmentList.css" ;
+import "./EquipmentList.css";
 
 interface Equipment {
   id: number;
@@ -108,22 +108,24 @@ const EquipmentList: React.FC = () => {
   };
 
   // Remover equipamento
-  const removeEquipment = async (id: number) => {
+  const rejectEquipment = async (id: number) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/emprestimos/${id}`, {
-        method: "DELETE",
+      const response = await fetch(`http://127.0.0.1:5000/api/emprestimos/${id}/rejeitar`, {
+        method: "POST",
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || "Erro ao remover equipamento");
+        throw new Error(errorText || "Erro ao rejeitar equipamento");
       }
 
-      setEquipments((prevEquipments) => prevEquipments.filter((item) => item.id !== id));
-      setToastMessage("Equipamento removido com sucesso!");
+      setEquipments((prevEquipments) =>
+        prevEquipments.filter((item) => item.id !== id)
+      );
+      setToastMessage("Equipamento rejeitado com sucesso!");
     } catch (error) {
-      console.error("Erro ao remover equipamento:", error);
-      setToastMessage("Erro ao remover equipamento. Tente novamente.");
+      console.error("Erro ao rejeitar equipamento:", error);
+      setToastMessage("Erro ao rejeitar equipamento. Tente novamente.");
     }
   };
 
@@ -131,7 +133,7 @@ const EquipmentList: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Lista de Equipamentos</IonTitle>
+          <IonTitle>Equipamentos solicitados</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
@@ -168,7 +170,10 @@ const EquipmentList: React.FC = () => {
                 <td>{equipment.acessorios || "N/A"}</td>
                 <td>{equipment.observacoes || "N/A"}</td>
                 <td>
-                  <IonButton color="danger" onClick={() => removeEquipment(equipment.id)}>
+                  <IonButton
+                    color="danger"
+                    onClick={() => rejectEquipment(equipment.id)}
+                  >
                     Remover
                   </IonButton>
                 </td>

@@ -19,7 +19,7 @@ const PendingRequests: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Fetch requests from API
+  // Fetch pending requests from API
   useEffect(() => {
     const fetchRequests = async () => {
       try {
@@ -28,7 +28,12 @@ const PendingRequests: React.FC = () => {
           throw new Error(`Erro ao buscar dados: ${response.statusText}`);
         }
         const data = await response.json();
-        setPendingRequests(data);
+
+        // Filtrar solicitações pendentes (não aprovadas e não rejeitadas)
+        const pending = data.filter(
+          (request: any) => !request.aprovado && !request.rejeitado
+        );
+        setPendingRequests(pending);
       } catch (err: any) {
         setError(err.message || 'Erro inesperado ao buscar dados.');
       } finally {
@@ -39,18 +44,14 @@ const PendingRequests: React.FC = () => {
     fetchRequests();
   }, []);
 
-  // Handle API actions
+  // Handle API actions (approve or reject)
   const handleAction = async (id: number, action: 'aprovar' | 'rejeitar') => {
     try {
-      if (!['aprovar', 'rejeitar'].includes(action)) {
-        throw new Error('Ação inválida.');
-      }
-
       const endpoint = `http://127.0.0.1:5000/api/emprestimos/${id}/${action}`;
       const response = await fetch(endpoint, { method: 'POST' });
 
       if (response.ok) {
-        // Atualiza o estado removendo o item processado
+        // Remove the processed item from the state
         setPendingRequests((prevRequests) =>
           prevRequests.filter((request) => request.id !== id)
         );
@@ -120,8 +121,7 @@ const PendingRequests: React.FC = () => {
               <th>Número de Série</th>
               <th>Número do Ativo</th>
               <th>Acessórios</th>
-              <th>Retornado</th>
-              <th>Contrato Assinado</th>
+              <th>Devolvido</th>
               <th>Observações</th>
               <th>Ações</th>
             </tr>
@@ -137,7 +137,6 @@ const PendingRequests: React.FC = () => {
                 <td>{request.numero_patrimonio}</td>
                 <td>{request.acessorios || 'N/A'}</td>
                 <td>{request.devolvido ? 'Sim' : 'Não'}</td>
-                <td>{request.contrato_assinado ? 'Sim' : 'Não'}</td>
                 <td>{request.observacoes || 'N/A'}</td>
                 <td>
                   <IonButton

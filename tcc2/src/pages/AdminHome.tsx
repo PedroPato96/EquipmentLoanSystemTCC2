@@ -23,8 +23,10 @@ const AdminHome: React.FC = () => {
 
   const handleLogoff = () => {
     console.log('Usuário deslogado'); 
-    // Redirecionar para a página de login
-    history.push('/login');
+    // Limpar os dados de autenticação (como no contexto ou estado global)
+    // Após limpar, substitui a página atual pela de login e força o recarregamento
+    history.replace('/login');  // Isso substitui a URL na navegação, não adicionando a entrada no histórico
+    window.location.reload();  // Força a recarga completa da página, limpando o estado
   };
 
   return (
@@ -52,21 +54,11 @@ const AdminHome: React.FC = () => {
                 color="success"
                 onClick={() => navigateTo("/equipment-list")}
               >
-                Lista de Equipamentos
+                Resumo de equipamentos emprestados
               </IonButton>
             </IonCol>
           </IonRow>
-          <IonRow>
-            <IonCol size="12" size-md="6">
-              <IonButton
-                expand="block"
-                color="tertiary"
-                onClick={() => navigateTo("/equipment-summary")} // Novo botão
-              >
-                Resumo de Equipamentos por Tipo
-              </IonButton>
-            </IonCol>
-          </IonRow>
+          
           <IonRow>
             <IonCol size="12">
               <IonButton expand="block" color="danger" onClick={handleLogoff}>

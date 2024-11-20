@@ -13,15 +13,26 @@ import {
   IonInput,
 } from '@ionic/react';
 import { useAuth } from '../context/AuthContext';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const { login, isAuthenticated, userRole } = useAuth(); // Obtenha a função de login e o estado de autenticação do contexto
   const history = useHistory(); // Obtenha o history para redirecionar
-  const location = useLocation<{ from: { pathname: string } }>(); // Para redirecionar de volta
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Verifica se já foi feito o recarregamento
+    if (!sessionStorage.getItem('hasReloaded') && !isAuthenticated) {
+      sessionStorage.setItem('hasReloaded', 'true'); // Marca que a página foi recarregada
+      window.location.reload(); // Força o recarregamento da página
+    } else if (isAuthenticated) {
+      // Se já estiver autenticado, redireciona para a página correta
+      const redirectPath = userRole === 'admin' ? '/admin-home' : '/home';
+      history.replace(redirectPath);
+    }
+  }, [isAuthenticated, userRole, history]);
 
   const handleLogin = () => {
     // Chame a função de login
@@ -29,21 +40,12 @@ const Login: React.FC = () => {
 
     // Se o login for bem-sucedido, redirecione
     if (isAuthenticated) {
-      // Redireciona para a página anterior ou para a página inicial apropriada
       const redirectPath = userRole === 'admin' ? '/admin-home' : '/home';
       history.push(redirectPath);
     } else {
       setError('Usuário ou senha incorretos.'); // Define uma mensagem de erro
     }
   };
-
-  // Verifica a autenticação após o login
-  useEffect(() => {
-    if (isAuthenticated) {
-      const redirectPath = userRole === 'admin' ? '/admin-home' : '/home';
-      history.replace(redirectPath);
-    }
-  }, [isAuthenticated, userRole, history]);
 
   return (
     <IonPage>

@@ -25,8 +25,9 @@ const Home: React.FC = () => {
   const handleLogoff = () => {
     // Aqui você deve limpar o estado do usuário (se aplicável)
     console.log('Usuário deslogado'); // Adicione a lógica para limpar o estado do usuário
-    // Redirecionar para a página de login
-    history.push('/login'); // Altere para a rota correta da sua página de login
+    // Substitui a URL da página atual pela página de login e força a recarga
+    history.replace('/login'); // Substitui a URL para login, sem adicionar nova entrada no histórico
+    window.location.reload(); // Força o recarregamento da página
   };
 
   return (

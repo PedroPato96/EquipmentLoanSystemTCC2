@@ -21,8 +21,8 @@ import './RequestLoan.css'; // Certifique-se de que o CSS foi importado
 const RequestLoan: React.FC = () => {
   const [equipmentType, setEquipmentType] = useState('');
   const [model, setModel] = useState('');
-  const [serialNumber, setSerialNumber] = useState('');
-  const [assetNumber, setAssetNumber] = useState('');
+  const [serialNumber, setSerialNumber] = useState(''); // Campo não visível
+  const [assetNumber, setAssetNumber] = useState(''); // Campo não visível
   const [accessories, setAccessories] = useState('');
   const [quantity, setQuantity] = useState(0);
   const [dates, setDates] = useState<string[]>([]);
@@ -39,8 +39,8 @@ const RequestLoan: React.FC = () => {
     const requestData = {
       equipamento: equipmentType,
       modelo_equipamento: model,
-      numero_serie: serialNumber,
-      numero_patrimonio: assetNumber,
+      numero_serie: serialNumber || 'Não Aplicável', // Envia "Não Aplicável" se vazio
+      numero_patrimonio: assetNumber || 'Não Aplicável', // Envia "Não Aplicável" se vazio
       acessorios: accessories,
       quantidade: quantity,
       data_in: dates[0], // Data de início do uso
@@ -64,7 +64,7 @@ const RequestLoan: React.FC = () => {
         setToastMessage('Empréstimo solicitado com sucesso!');
       } else {
         const error = await response.json();
-        setToastMessage(`Erro: ${error.message}`);
+        setToastMessage('Erro ao se conectar ao servidor.');
       }
     } catch (error) {
       setToastMessage('Erro ao se conectar ao servidor.');
@@ -98,7 +98,8 @@ const RequestLoan: React.FC = () => {
             />
           </IonItem>
 
-          <IonItem>
+          {/* Campos ocultos, sem necessidade de exibição */}
+          {/* <IonItem>
             <IonLabel>Número de Série</IonLabel>
             <IonInput
               value={serialNumber}
@@ -114,7 +115,7 @@ const RequestLoan: React.FC = () => {
               onIonChange={(e) => setAssetNumber(e.detail.value!)}
               placeholder="Digite o número do patrimônio"
             />
-          </IonItem>
+          </IonItem> */}
 
           <IonItem>
             <IonLabel>Acessórios</IonLabel>
@@ -174,4 +175,3 @@ const RequestLoan: React.FC = () => {
 };
 
 export default RequestLoan;
-
