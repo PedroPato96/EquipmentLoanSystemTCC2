@@ -15,6 +15,7 @@ import './PendingRequests.css';
 const PendingRequests: React.FC = () => {
   const history = useHistory();
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
+  const [approvedRequests, setApprovedRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -29,11 +30,17 @@ const PendingRequests: React.FC = () => {
         }
         const data = await response.json();
 
-        // Filtrar solicitações pendentes (não aprovadas e não rejeitadas)
+        // Filtra as solicitações pendentes (devolvido: false)
         const pending = data.filter(
-          (request: any) => !request.aprovado && !request.rejeitado
+          (request: any) => !request.devolvido && !request.rejeitado
         );
+        // Filtra as solicitações aprovadas (devolvido: true)
+        const approved = data.filter(
+          (request: any) => request.devolvido && !request.rejeitado
+        );
+
         setPendingRequests(pending);
+        setApprovedRequests(approved);
       } catch (err: any) {
         setError(err.message || 'Erro inesperado ao buscar dados.');
       } finally {
@@ -51,7 +58,15 @@ const PendingRequests: React.FC = () => {
       const response = await fetch(endpoint, { method: 'POST' });
 
       if (response.ok) {
-        // Remove the processed item from the state
+        // Se for aprovado, mover para a lista de aprovadas
+        if (action === 'aprovar') {
+          const approvedRequest = pendingRequests.find((request) => request.id === id);
+          if (approvedRequest) {
+            setApprovedRequests((prevApproved) => [...prevApproved, approvedRequest]);
+          }
+        }
+
+        // Remove o item da lista de pendentes
         setPendingRequests((prevRequests) =>
           prevRequests.filter((request) => request.id !== id)
         );
@@ -111,51 +126,102 @@ const PendingRequests: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <table className="pending-requests-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Funcionário</th>
-              <th>Equipamento</th>
-              <th>Modelo</th>
-              <th>Número de Série</th>
-              <th>Número do Ativo</th>
-              <th>Acessórios</th>
-              <th>Devolvido</th>
-              <th>Observações</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pendingRequests.map((request) => (
-              <tr key={request.id}>
-                <td>{request.id}</td>
-                <td>{request.funcionario}</td>
-                <td>{request.equipamento}</td>
-                <td>{request.modelo_equipamento || 'N/A'}</td>
-                <td>{request.numero_serie}</td>
-                <td>{request.numero_patrimonio}</td>
-                <td>{request.acessorios || 'N/A'}</td>
-                <td>{request.devolvido ? 'Sim' : 'Não'}</td>
-                <td>{request.observacoes || 'N/A'}</td>
-                <td>
-                  <IonButton
-                    onClick={() => handleAction(request.id, 'aprovar')}
-                    color="success"
-                  >
-                    Aprovar
-                  </IonButton>
-                  <IonButton
-                    onClick={() => handleAction(request.id, 'rejeitar')}
-                    color="danger"
-                  >
-                    Rejeitar
-                  </IonButton>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {approvedRequests.length > 0 && (
+          <div>
+            <h2>Solicitações Aprovadas</h2>
+            <table className="pending-requests-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Funcionário</th>
+                  <th>Equipamento</th>
+                  <th>Modelo</th>
+                  <th>Número de Série</th>
+                  <th>Número do Ativo</th>
+                  <th>Acessórios</th>
+                  <th>Devolvido</th>
+                  <th>Observações</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {approvedRequests.map((request) => (
+                  <tr key={request.id}>
+                    <td>{request.id}</td>
+                    <td>{request.funcionario}</td>
+                    <td>{request.equipamento}</td>
+                    <td>{request.modelo_equipamento || 'N/A'}</td>
+                    <td>{request.numero_serie}</td>
+                    <td>{request.numero_patrimonio}</td>
+                    <td>{request.acessorios || 'N/A'}</td>
+                    <td>{request.devolvido ? 'Sim' : 'Não'}</td>
+                    <td>{request.observacoes || 'N/A'}</td>
+                    <td>
+                      <IonButton
+                        onClick={() => handleAction(request.id, 'rejeitar')}
+                        color="danger"
+                      >
+                        Devolvido
+                      </IonButton>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {pendingRequests.length > 0 && (
+          <div>
+            <h2>Solicitações Pendentes</h2>
+            <table className="pending-requests-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Funcionário</th>
+                  <th>Equipamento</th>
+                  <th>Modelo</th>
+                  <th>Número de Série</th>
+                  <th>Número do Ativo</th>
+                  <th>Acessórios</th>
+                  <th>Devolvido</th>
+                  <th>Observações</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingRequests.map((request) => (
+                  <tr key={request.id}>
+                    <td>{request.id}</td>
+                    <td>{request.funcionario}</td>
+                    <td>{request.equipamento}</td>
+                    <td>{request.modelo_equipamento || 'N/A'}</td>
+                    <td>{request.numero_serie}</td>
+                    <td>{request.numero_patrimonio}</td>
+                    <td>{request.acessorios || 'N/A'}</td>
+                    <td>{request.devolvido ? 'Sim' : 'Não'}</td>
+                    <td>{request.observacoes || 'N/A'}</td>
+                    <td>
+                      <IonButton
+                        onClick={() => handleAction(request.id, 'aprovar')}
+                        color="success"
+                      >
+                        Aprovar
+                      </IonButton>
+                      <IonButton
+                        onClick={() => handleAction(request.id, 'rejeitar')}
+                        color="danger"
+                      >
+                        Rejeitar
+                      </IonButton>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
         <IonButton
           expand="full"
           onClick={() => history.goBack()}
