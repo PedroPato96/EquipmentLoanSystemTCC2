@@ -174,7 +174,7 @@ const EquipmentList: React.FC = () => {
                     color="danger"
                     onClick={() => rejectEquipment(equipment.id)}
                   >
-                    Remover
+                    Marcar como devolvido
                   </IonButton>
                 </td>
               </tr>
