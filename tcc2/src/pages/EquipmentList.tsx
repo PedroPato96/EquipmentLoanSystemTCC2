@@ -138,7 +138,7 @@ const EquipmentList: React.FC = () => {
       </IonHeader>
       <IonContent className="ion-padding">
         <IonButton expand="block" onClick={() => setIsModalOpen(true)}>
-          Adicionar Novo Equipamento
+          Emprestar manualmente
         </IonButton>
         <IonButton expand="block" color="light" onClick={() => history.goBack()}>
           Voltar
