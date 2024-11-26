@@ -13,7 +13,7 @@ import {
   IonToast,
 } from "@ionic/react";
 import EquipmentTable from "../components/EquipmentTable";
-import { useHistory } from "react-router-dom"; // Importando useHistory
+import { useHistory } from "react-router-dom";
 
 interface Equipment {
   id: number;
@@ -30,15 +30,17 @@ interface Equipment {
 }
 
 const MyEquipments: React.FC = () => {
-  const history = useHistory(); // Inicializando o hook useHistory
+  const history = useHistory();
   const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const usuario = "nome_do_usuario";  // Substitua por como você obtém o nome do usuário
+
   useEffect(() => {
     const fetchEquipments = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/api/meus-equipamentos");
+        const response = await fetch(`http://127.0.0.1:5000/api/meus-equipamentos?funcionario=${usuario}`);
         if (!response.ok) {
           throw new Error(`Erro ao carregar os dados: ${response.statusText}`);
         }
@@ -52,10 +54,10 @@ const MyEquipments: React.FC = () => {
     };
 
     fetchEquipments();
-  }, []);
+  }, [usuario]);
 
   const handleBack = () => {
-    history.goBack(); // Função para voltar à página anterior
+    history.goBack();
   };
 
   return (

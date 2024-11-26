@@ -63,20 +63,20 @@ const PendingRequests: React.FC = () => {
           const approvedRequest = pendingRequests.find((request) => request.id === id);
           if (approvedRequest) {
             setApprovedRequests((prevApproved) => [...prevApproved, approvedRequest]);
+            setPendingRequests((prevRequests) =>
+              prevRequests.filter((request) => request.id !== id)
+            );
+            setToastMessage('Solicitação aprovada com sucesso!');
           }
         }
 
-        // Remove o item da lista de pendentes
-        setPendingRequests((prevRequests) =>
-          prevRequests.filter((request) => request.id !== id)
-        );
-
-        const actionMessage = {
-          aprovar: 'aprovada',
-          rejeitar: 'rejeitada',
-        };
-
-        setToastMessage(`Solicitação ${actionMessage[action]} com sucesso!`);
+        // Se for rejeitado, remover da lista de pendentes
+        if (action === 'rejeitar') {
+          setPendingRequests((prevRequests) =>
+            prevRequests.filter((request) => request.id !== id)
+          );
+          setToastMessage('Solicitação rejeitada com sucesso!');
+        }
       } else {
         throw new Error(`Erro ao ${action} a solicitação.`);
       }

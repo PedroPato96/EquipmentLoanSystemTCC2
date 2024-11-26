@@ -24,13 +24,16 @@ def get_db_connection():
         print("Erro ao conectar ao banco de dados:", str(e))
         raise
 
-# Endpoint para listar todos os empréstimos pendentes
+# Endpoint para listar todos os empréstimos (pendentes e aprovados)
 @app.route('/api/emprestimos', methods=['GET'])
 def get_emprestimos():
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute('SELECT * FROM emprestimos WHERE aprovado = FALSE AND rejeitado = FALSE;')
+                cursor.execute('''
+                    SELECT * FROM emprestimos 
+                    WHERE rejeitado = FALSE;
+                ''')
                 emprestimos = cursor.fetchall()
 
                 # Transformar em JSON
@@ -108,12 +111,13 @@ def aprovar_emprestimo(id):
     try:
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
+                # Atualiza o empréstimo, além de "aprovado", marca "devolvido" como True
                 cursor.execute(
                     '''
                     UPDATE emprestimos
-                    SET aprovado = TRUE
+                    SET aprovado = TRUE, devolvido = TRUE
                     WHERE id = %s
-                    RETURNING id;
+                    RETURNING id, aprovado, devolvido;
                     ''',
                     (id,)
                 )
@@ -121,7 +125,13 @@ def aprovar_emprestimo(id):
                 conn.commit()
 
                 if emprestimo_aprovado:
-                    return jsonify({"id": emprestimo_aprovado[0], "message": "Empréstimo aprovado com sucesso."}), 200
+                    print(f"Empréstimo {id} aprovado e devolvido com sucesso: {emprestimo_aprovado}")  # Log de aprovação
+                    return jsonify({
+                        "id": emprestimo_aprovado[0],
+                        "aprovado": emprestimo_aprovado[1],
+                        "devolvido": emprestimo_aprovado[2],
+                        "message": "Empréstimo aprovado com sucesso."
+                    }), 200
                 else:
                     return jsonify({"error": "Empréstimo não encontrado."}), 404
     except Exception as e:
